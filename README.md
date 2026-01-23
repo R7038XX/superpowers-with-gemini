@@ -67,6 +67,16 @@ Fetch and follow instructions from https://raw.githubusercontent.com/obra/superp
 
 **Detailed docs:** [docs/README.codex.md](docs/README.codex.md)
 
+### Gemini CLI
+
+Tell Gemini CLI:
+
+```
+Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.gemini/INSTALL.md
+```
+
+**Detailed docs:** [docs/README.gemini.md](docs/README.gemini.md)
+
 ### OpenCode
 
 Tell OpenCode:
