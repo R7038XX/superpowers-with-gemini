@@ -14,6 +14,8 @@ Next up, once you say "go", it launches a *subagent-driven-development* process,
 
 There's a bunch more to it, but that's the core of the system. And because the skills trigger automatically, you don't need to do anything special. Your coding agent just has Superpowers.
 
+For Gemini CLI, Superpowers uses a bootstrap command to disclose skills and tool mappings, then expects you to load the relevant skills with `superpowers-gemini use-skill` when they apply.
+
 
 ## Sponsorship
 
@@ -84,6 +86,8 @@ Tell Gemini CLI:
 ```
 Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.gemini/INSTALL.md
 ```
+
+If your Gemini CLI uses an `AGENTS.md` initial prompt file, add the bootstrap block described in the Gemini docs so the skills load on startup.
 
 **Detailed docs:** [docs/README.gemini.md](docs/README.gemini.md)
 
