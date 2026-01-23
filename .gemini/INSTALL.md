@@ -24,14 +24,14 @@ Quick setup to enable superpowers skills in Gemini CLI.
    ## Superpowers System
 
    <EXTREMELY_IMPORTANT>
-   You have superpowers. Superpowers teach you new skills and capabilities. RIGHT NOW run: `~/.config/gemini/superpowers/.codex/superpowers-codex bootstrap` and follow the instructions it returns.
+   You have superpowers. Superpowers teach you new skills and capabilities. RIGHT NOW run: `~/.config/gemini/superpowers/.gemini/superpowers-gemini bootstrap` and follow the instructions it returns.
    </EXTREMELY_IMPORTANT>
    ```
 
 ## Verification
 
 ```bash
-~/.config/gemini/superpowers/.codex/superpowers-codex find-skills
+~/.config/gemini/superpowers/.gemini/superpowers-gemini find-skills
 ```
 
 You should see a list of available skills.
@@ -39,7 +39,7 @@ You should see a list of available skills.
 ## Usage
 
 ```bash
-~/.config/gemini/superpowers/.codex/superpowers-codex use-skill superpowers:brainstorming
+~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill superpowers:brainstorming
 ```
 
 ## Updating
@@ -56,18 +56,18 @@ Restart Gemini CLI after updating, and re-check `~/.config/gemini/AGENTS.md` if 
 ### Skills not found
 
 1. Check the skills directory: `ls ~/.config/gemini/superpowers/skills`
-2. Verify the CLI works: `~/.config/gemini/superpowers/.codex/superpowers-codex find-skills`
+2. Verify the CLI works: `~/.config/gemini/superpowers/.gemini/superpowers-gemini find-skills`
 3. Ensure each skill has a `SKILL.md` file
 
 ### CLI script not executable
 
 ```bash
-chmod +x ~/.config/gemini/superpowers/.codex/superpowers-codex
+chmod +x ~/.config/gemini/superpowers/.gemini/superpowers-gemini
 ```
 
 ### Node.js errors
 
-The `superpowers-codex` script requires Node.js:
+The `superpowers-gemini` script requires Node.js:
 
 ```bash
 node --version

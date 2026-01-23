@@ -1,0 +1,33 @@
+# Superpowers Bootstrap for Gemini CLI
+
+<EXTREMELY_IMPORTANT>
+You have superpowers.
+
+**Tool for running skills:**
+- `~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill <skill-name>`
+
+**Tool Mapping for Gemini CLI:**
+When skills reference tools you don't have, substitute your equivalent tools:
+- `TodoWrite` → your Gemini CLI task/planning tool
+- `Task` tool with subagents → explain that subagents are not available and do the work yourself
+- `Skill` tool → `~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill` command (already available)
+- `Read`, `Write`, `Edit`, `Bash` → use your native tools with similar functions
+
+**Skills naming:**
+- Superpowers skills: `superpowers:skill-name` (from ~/.config/gemini/superpowers/skills/)
+- Personal skills: `skill-name` (from ~/.config/gemini/skills/)
+- Personal skills override superpowers skills when names match
+
+**Critical Rules:**
+- Before ANY task, review the skills list (shown below)
+- If a relevant skill exists, you MUST use `~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill` to load it
+- Announce: "I've read the [Skill Name] skill and I'm using it to [purpose]"
+- Skills with checklists require your planning tool todos for each item
+- NEVER skip mandatory workflows (brainstorming before coding, TDD, systematic debugging)
+
+**Skills location:**
+- Superpowers skills: ~/.config/gemini/superpowers/skills/
+- Personal skills: ~/.config/gemini/skills/ (override superpowers when names match)
+
+IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+</EXTREMELY_IMPORTANT>

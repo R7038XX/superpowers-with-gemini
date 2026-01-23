@@ -1,0 +1,224 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+const command = process.argv[2];
+const arg = process.argv[3];
+
+const homeDir = os.homedir();
+const geminiConfigDir = path.join(homeDir, '.config', 'gemini');
+const superpowersRepoDir = path.join(geminiConfigDir, 'superpowers');
+const superpowersSkillsDir = path.join(superpowersRepoDir, 'skills');
+const personalSkillsDir = path.join(geminiConfigDir, 'skills');
+const bootstrapFile = path.join(superpowersRepoDir, '.gemini', 'superpowers-bootstrap.md');
+
+async function main() {
+    const skillsCore = await import('../lib/skills-core.js');
+    const {
+        extractFrontmatter,
+        findSkillsInDir,
+        resolveSkillPath,
+        checkForUpdates,
+        stripFrontmatter
+    } = skillsCore;
+
+    function printSkill(skillPath, sourceType) {
+        const skillFile = path.join(skillPath, 'SKILL.md');
+        const relPath = sourceType === 'personal'
+            ? path.relative(personalSkillsDir, skillPath)
+            : path.relative(superpowersSkillsDir, skillPath);
+
+        if (sourceType === 'personal') {
+            console.log(relPath.replace(/\\/g, '/'));
+        } else {
+            console.log(`superpowers:${relPath.replace(/\\/g, '/')}`);
+        }
+
+        const { description } = extractFrontmatter(skillFile);
+        if (description) console.log(`  ${description}`);
+        console.log('');
+    }
+
+    function runFindSkills() {
+        console.log('Available skills:');
+        console.log('==================');
+        console.log('');
+
+        const foundSkills = new Set();
+
+        const personalSkills = findSkillsInDir(personalSkillsDir, 'personal', 2);
+        for (const skill of personalSkills) {
+            const relPath = path.relative(personalSkillsDir, skill.path);
+            foundSkills.add(relPath);
+            printSkill(skill.path, 'personal');
+        }
+
+        const superpowersSkills = findSkillsInDir(superpowersSkillsDir, 'superpowers', 1);
+        for (const skill of superpowersSkills) {
+            const relPath = path.relative(superpowersSkillsDir, skill.path);
+            if (!foundSkills.has(relPath)) {
+                printSkill(skill.path, 'superpowers');
+            }
+        }
+
+        console.log('Usage:');
+        console.log('  superpowers-gemini use-skill <skill-name>   # Load a specific skill');
+        console.log('');
+        console.log('Skill naming:');
+        console.log('  Superpowers skills: superpowers:skill-name (from ~/.config/gemini/superpowers/skills/)');
+        console.log('  Personal skills: skill-name (from ~/.config/gemini/skills/)');
+        console.log('  Personal skills override superpowers skills when names match.');
+        console.log('');
+        console.log('Note: All skills are disclosed at session start via bootstrap.');
+    }
+
+    function runBootstrap() {
+        console.log('# Superpowers Bootstrap for Gemini CLI');
+        console.log('# ====================================');
+        console.log('');
+
+        if (checkForUpdates(superpowersRepoDir)) {
+            console.log('## Update Available');
+            console.log('');
+            console.log('⚠️  Your superpowers installation is behind the latest version.');
+            console.log('To update, run: `cd ~/.config/gemini/superpowers && git pull`');
+            console.log('');
+            console.log('---');
+            console.log('');
+        }
+
+        if (fs.existsSync(bootstrapFile)) {
+            console.log('## Bootstrap Instructions:');
+            console.log('');
+            try {
+                const content = fs.readFileSync(bootstrapFile, 'utf8');
+                console.log(content);
+            } catch (error) {
+                console.log(`Error reading bootstrap file: ${error.message}`);
+            }
+            console.log('');
+            console.log('---');
+            console.log('');
+        }
+
+        console.log('## Available Skills:');
+        console.log('');
+        runFindSkills();
+
+        console.log('');
+        console.log('---');
+        console.log('');
+
+        console.log('## Auto-loading superpowers:using-superpowers skill:');
+        console.log('');
+        runUseSkill('superpowers:using-superpowers');
+
+        console.log('');
+        console.log('---');
+        console.log('');
+        console.log('# Bootstrap Complete!');
+        console.log('# You now have access to all superpowers skills.');
+        console.log('# Use "superpowers-gemini use-skill <skill>" to load and apply skills.');
+        console.log('# Remember: If a skill applies to your task, you MUST use it!');
+    }
+
+    function normalizeSkillName(skillName) {
+        if (!skillName) return '';
+        if (skillName.startsWith('superpowers:')) {
+            const stripped = skillName.substring('superpowers:'.length);
+            if (stripped.startsWith('skills/')) {
+                return `superpowers:${stripped.substring('skills/'.length)}`;
+            }
+            return skillName;
+        }
+        if (skillName.startsWith('skills/')) {
+            return skillName.substring('skills/'.length);
+        }
+        return skillName;
+    }
+
+    function runUseSkill(skillName) {
+        if (!skillName) {
+            console.log('Usage: superpowers-gemini use-skill <skill-name>');
+            console.log('Examples:');
+            console.log('  superpowers-gemini use-skill superpowers:brainstorming  # Load superpowers skill');
+            console.log('  superpowers-gemini use-skill brainstorming              # Load personal skill (or superpowers if not found)');
+            console.log('  superpowers-gemini use-skill my-custom-skill            # Load personal skill');
+            return;
+        }
+
+        const normalizedSkillName = normalizeSkillName(skillName);
+        const resolved = resolveSkillPath(normalizedSkillName, superpowersSkillsDir, personalSkillsDir);
+
+        if (!resolved) {
+            console.log(`Error: Skill not found: ${normalizedSkillName.replace(/^superpowers:/, '')}`);
+            console.log('');
+            console.log('Available skills:');
+            runFindSkills();
+            return;
+        }
+
+        const { skillFile, sourceType, skillPath } = resolved;
+
+        if (sourceType === 'personal') {
+            console.log(`# Loading personal skill: ${skillPath}`);
+        } else {
+            console.log(`# Loading superpowers skill: superpowers:${skillPath}`);
+        }
+        console.log(`# Source: ${skillFile}`);
+        console.log('');
+
+        let content;
+        let frontmatter;
+        try {
+            const fullContent = fs.readFileSync(skillFile, 'utf8');
+            const { name, description } = extractFrontmatter(skillFile);
+            content = stripFrontmatter(fullContent);
+            frontmatter = { name, description };
+        } catch (error) {
+            console.log(`Error reading skill file: ${error.message}`);
+            return;
+        }
+
+        const displayName = sourceType === 'personal' ? skillPath : `superpowers:${skillPath}`;
+        const skillDirectory = path.dirname(skillFile);
+
+        console.log(`# ${frontmatter.name || displayName}`);
+        if (frontmatter.description) {
+            console.log(`# ${frontmatter.description}`);
+        }
+        console.log(`# Skill-specific tools and reference files live in ${skillDirectory}`);
+        console.log('# ============================================');
+        console.log('');
+
+        console.log(content);
+    }
+
+    switch (command) {
+        case 'bootstrap':
+            runBootstrap();
+            break;
+        case 'use-skill':
+            runUseSkill(arg);
+            break;
+        case 'find-skills':
+            runFindSkills();
+            break;
+        default:
+            console.log('Superpowers for Gemini CLI');
+            console.log('Usage:');
+            console.log('  superpowers-gemini bootstrap              # Run complete bootstrap with all skills');
+            console.log('  superpowers-gemini use-skill <skill-name> # Load a specific skill');
+            console.log('  superpowers-gemini find-skills            # List all available skills');
+            console.log('');
+            console.log('Examples:');
+            console.log('  superpowers-gemini bootstrap');
+            console.log('  superpowers-gemini use-skill superpowers:brainstorming');
+            console.log('  superpowers-gemini use-skill my-custom-skill');
+            break;
+    }
+}
+
+main();
