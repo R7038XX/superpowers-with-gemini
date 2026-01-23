@@ -68,11 +68,36 @@ You should see a list of available skills.
 ~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill superpowers:brainstorming
 ```
 
+### Skill loading workflow
+
+1. Run the bootstrap to disclose all skills and rules:
+   ```bash
+   ~/.config/gemini/superpowers/.gemini/superpowers-gemini bootstrap
+   ```
+2. When a skill applies, load it explicitly:
+   ```bash
+   ~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill superpowers:using-superpowers
+   ```
+3. Announce that you loaded the skill and follow its checklist.
+
 ### Bootstrap all skills
 
 ```bash
 ~/.config/gemini/superpowers/.gemini/superpowers-gemini bootstrap
 ```
+
+## Tool mapping
+
+Skills are authored for Claude Code. In Gemini CLI, map tools as follows:
+
+| Superpowers tool | Gemini CLI equivalent |
+| --- | --- |
+| `TodoWrite` | Gemini CLI task/planning tool (use your native planning/todo feature). |
+| `Task` (subagents) | Subagents are unavailable; explain that and do the work directly. |
+| `Skill` | `~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill <skill-name>` |
+| `Read` / `Write` / `Edit` / `Bash` | Gemini CLI native file + shell tools. |
+
+If Gemini CLI exposes different names, keep the intent the same and note the substitution.
 
 ## Updating
 
