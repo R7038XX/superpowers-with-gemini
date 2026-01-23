@@ -17,6 +17,19 @@ Fetch and follow instructions from https://raw.githubusercontent.com/obra/superp
 - Gemini CLI installed (Node.js 20+)
 - Shell access to install files
 
+Install Gemini CLI (one of the following):
+
+```bash
+# Run instantly
+npx @google/gemini-cli
+
+# Or install globally
+npm install -g @google/gemini-cli
+
+# Or Homebrew (macOS/Linux)
+brew install gemini-cli
+```
+
 ### Installation Steps
 
 #### 1. Clone Superpowers
@@ -44,7 +57,17 @@ You have superpowers. Superpowers teach you new skills and capabilities. RIGHT N
 
 Gemini CLI automatically loads `GEMINI.md` in the current directory and parent directories.
 
-#### 4. Verify Installation
+#### 4. Authenticate Gemini CLI
+
+Choose one authentication method (per Gemini CLI docs):
+
+- **Google login (recommended):** run `gemini` and choose “Login with Google”.
+- **Gemini API key:** set `GEMINI_API_KEY` in your shell environment.
+- **Vertex AI:** set `GOOGLE_API_KEY` and `GOOGLE_GENAI_USE_VERTEXAI=true`.
+
+Refer to https://geminicli.com/docs/ for details and quota limits.
+
+#### 5. Verify Installation
 
 Tell Gemini CLI:
 
@@ -75,6 +98,15 @@ Run ~/.gemini/superpowers/.gemini/superpowers-gemini bootstrap
 ```
 
 This loads the complete bootstrap with all skill information.
+
+### Non-interactive Usage
+
+Gemini CLI supports script-friendly mode that pairs well with Superpowers documentation and bootstrap:
+
+```bash
+gemini -p "Summarize the architecture of this repo"
+gemini -p "List available skills" --output-format json
+```
 
 ### Personal Skills
 
@@ -125,6 +157,12 @@ Skills written for Claude Code are adapted for Gemini CLI with these mappings:
 - `Skill` tool → `~/.gemini/superpowers/.gemini/superpowers-gemini use-skill`
 - File operations / shell commands → Use Gemini CLI built-in tools
 - Web fetching/search → Use Gemini CLI web tools
+
+## Configuration Notes
+
+- **Context files:** Gemini CLI reads `GEMINI.md` from the current directory and parent directories.
+- **MCP servers:** configure `~/.gemini/settings.json` for custom tools (see Gemini CLI MCP docs).
+- **Trusted folders / sandboxing:** Gemini CLI policies may block tool execution until a folder is trusted.
 
 ## Updating
 

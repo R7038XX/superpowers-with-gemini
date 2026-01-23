@@ -42,6 +42,14 @@ npm install -g @google/gemini-cli
 
    Gemini CLI automatically loads `GEMINI.md` in the current directory and parent directories.
 
+4. **Authenticate Gemini CLI** (choose one):
+
+   - **Google login (recommended):** run `gemini` and choose “Login with Google”.
+   - **Gemini API key:** set `GEMINI_API_KEY` in your shell environment.
+   - **Vertex AI:** set `GOOGLE_API_KEY` and `GOOGLE_GENAI_USE_VERTEXAI=true`.
+
+   For details, see https://geminicli.com/docs/ or the Gemini CLI authentication guide.
+
 ## Verification
 
 Test the installation:
@@ -51,3 +59,8 @@ Test the installation:
 ```
 
 You should see skill listings and bootstrap instructions. The system is now ready for use.
+
+## Optional Configuration
+
+- **MCP servers / custom tools:** configure `~/.gemini/settings.json` as documented by Gemini CLI.
+- **Trusted folders / sandboxing:** adjust per-project policies in Gemini CLI if needed.
