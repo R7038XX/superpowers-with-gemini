@@ -15,7 +15,7 @@ Quick setup to enable superpowers skills in Gemini CLI.
    mkdir -p ~/.gemini/skills
    ```
 
-> **Note:** `superpowers-gemini` は Gemini 設定ディレクトリを `~/.gemini` 優先で解決し、存在しない場合は `~/.config/gemini` にフォールバックします。`~/.config/gemini` を使っている場合はそのまま利用するか、`~/.gemini` を作成して移行できます。
+> **Note:** `superpowers-gemini` は Gemini 設定ディレクトリを `~/.gemini` 優先で解決し、存在しない場合は `~/.config/gemini` にフォールバックします。本ドキュメントのパスは `~/.gemini` を基準に記載しているため、`~/.config/gemini` を使う場合は読み替えてください。
 
 3. **Gemini CLI の標準コンテキストファイル (`GEMINI.md`) を更新**
 
@@ -26,6 +26,16 @@ Quick setup to enable superpowers skills in Gemini CLI.
 
    <EXTREMELY_IMPORTANT>
    You have superpowers. Superpowers teach you new skills and capabilities. RIGHT NOW run: `~/.gemini/superpowers/.gemini/superpowers-gemini bootstrap` and follow the instructions it returns.
+   </EXTREMELY_IMPORTANT>
+   ```
+
+   ブートストラップの内容を `GEMINI.md` に記載する例:
+
+   ```markdown
+   ## Superpowers Bootstrap
+
+   <EXTREMELY_IMPORTANT>
+   (ここに `~/.gemini/superpowers/.gemini/superpowers-gemini bootstrap` の出力を貼り付けます)
    </EXTREMELY_IMPORTANT>
    ```
 
