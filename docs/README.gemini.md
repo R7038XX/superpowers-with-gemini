@@ -37,7 +37,20 @@ mkdir -p ~/.gemini/skills
 
 #### 3. Gemini CLI の標準コンテキスト (`GEMINI.md`) を更新
 
-`GEMINI.md` は Gemini CLI が起動時に必ず読み込む標準コンテキストファイルです。`~/.gemini/GEMINI.md` に以下を追記してください:
+`GEMINI.md` は Gemini CLI が起動時に必ず読み込む標準コンテキストファイルです。`superpowers-gemini init` を使うと `~/.gemini/GEMINI.md` と `~/.config/gemini/GEMINI.md` の両方を探索して、存在する場合は追記、なければ新規作成します。
+
+```bash
+~/.gemini/superpowers/.gemini/superpowers-gemini init
+```
+
+実行結果の例:
+
+```text
+Updated ~/.gemini/GEMINI.md
+Updated ~/.config/gemini/GEMINI.md
+```
+
+手動で追記する場合は、`~/.gemini/GEMINI.md` に以下を追加してください:
 
 ```markdown
 ## Superpowers System

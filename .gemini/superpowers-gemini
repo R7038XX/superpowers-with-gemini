@@ -47,10 +47,14 @@ async function main() {
       ? `~${targetPath.slice(homeDir.length)}`
       : targetPath;
   const resolvedGeminiDir = displayPath(geminiConfigDir);
+  const replaceGeminiDirForDir = (content, targetDir) => {
+    const resolvedTargetDir = displayPath(targetDir);
+    return content
+      .replace(/{{GEMINI_CONFIG_DIR}}/g, resolvedTargetDir)
+      .replace(/~\/\.gemini/g, resolvedTargetDir);
+  };
   const replaceGeminiDir = (content) =>
-    content
-      .replace(/{{GEMINI_CONFIG_DIR}}/g, resolvedGeminiDir)
-      .replace(/~\/\.gemini/g, resolvedGeminiDir);
+    replaceGeminiDirForDir(content, geminiConfigDir);
 
   function printSkill(skillPath, sourceType) {
     const skillFile = path.join(skillPath, "SKILL.md");
@@ -175,6 +179,66 @@ async function main() {
     );
   }
 
+  function runInit() {
+    let bootstrapContent;
+    try {
+      bootstrapContent = fs.readFileSync(bootstrapFile, "utf8");
+    } catch (error) {
+      console.log(`Error reading bootstrap file: ${error.message}`);
+      return;
+    }
+
+    const targetDirs = [preferredGeminiDir, fallbackGeminiDir];
+
+    for (const targetDir of targetDirs) {
+      const geminiFile = path.join(targetDir, "GEMINI.md");
+      const displayGeminiFile = displayPath(geminiFile);
+
+      try {
+        fs.mkdirSync(targetDir, { recursive: true });
+      } catch (error) {
+        console.log(`Failed to create ${displayGeminiFile}: ${error.message}`);
+        continue;
+      }
+
+      let existingContent = "";
+      if (fs.existsSync(geminiFile)) {
+        try {
+          existingContent = fs.readFileSync(geminiFile, "utf8");
+        } catch (error) {
+          console.log(`Failed to read ${displayGeminiFile}: ${error.message}`);
+          continue;
+        }
+      }
+
+      const block = replaceGeminiDirForDir(
+        bootstrapContent,
+        targetDir,
+      ).trim();
+      const normalizedExisting = existingContent.replace(/\r\n/g, "\n");
+      const normalizedBlock = block.replace(/\r\n/g, "\n");
+
+      if (normalizedExisting.includes(normalizedBlock)) {
+        console.log(
+          `Skipped ${displayGeminiFile} (already contains bootstrap)`,
+        );
+        continue;
+      }
+
+      const trimmedExisting = existingContent.replace(/\s*$/, "");
+      const nextContent = trimmedExisting
+        ? `${trimmedExisting}\n\n${block}\n`
+        : `${block}\n`;
+
+      try {
+        fs.writeFileSync(geminiFile, nextContent, "utf8");
+        console.log(`Updated ${displayGeminiFile}`);
+      } catch (error) {
+        console.log(`Failed to update ${displayGeminiFile}: ${error.message}`);
+      }
+    }
+  }
+
   function normalizeSkillName(skillName) {
     if (!skillName) return "";
     if (skillName.startsWith("superpowers:")) {
@@ -266,6 +330,10 @@ async function main() {
     case "bootstrap":
       runBootstrap();
       break;
+    case "init":
+    case "install":
+      runInit();
+      break;
     case "use-skill":
       runUseSkill(arg);
       break;
@@ -279,6 +347,12 @@ async function main() {
         "  superpowers-gemini bootstrap              # Run complete bootstrap with all skills",
       );
       console.log(
+        "  superpowers-gemini init                   # Update GEMINI.md files with bootstrap content",
+      );
+      console.log(
+        "  superpowers-gemini install                # Alias for init",
+      );
+      console.log(
         "  superpowers-gemini use-skill <skill-name> # Load a specific skill",
       );
       console.log(
@@ -287,6 +361,7 @@ async function main() {
       console.log("");
       console.log("Examples:");
       console.log("  superpowers-gemini bootstrap");
+      console.log("  superpowers-gemini init");
       console.log("  superpowers-gemini use-skill superpowers:brainstorming");
       console.log("  superpowers-gemini use-skill my-custom-skill");
       break;
