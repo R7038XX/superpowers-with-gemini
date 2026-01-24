@@ -70,6 +70,14 @@ You should see a list of available skills.
 ~/.gemini/superpowers/.gemini/superpowers-gemini use-skill superpowers:brainstorming
 ```
 
+### Doctor
+
+セットアップ状況を診断して対処手順を確認するには次を実行します。
+
+```bash
+~/.gemini/superpowers/.gemini/superpowers-gemini doctor
+```
+
 ## Updating
 
 ```bash
