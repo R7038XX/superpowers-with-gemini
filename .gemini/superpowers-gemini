@@ -9,7 +9,7 @@ function warnIfUnsupportedNode() {
   const majorVersion = Number.parseInt(nodeVersion.split(".")[0], 10);
   if (!Number.isNaN(majorVersion) && majorVersion < 20) {
     console.warn(
-      `⚠️  Node.js ${nodeVersion} detected. superpowers-gemini requires Node.js >=20.`,
+      `⚠️  Node.js ${nodeVersion} detected. superpowers-gemini requires Node.js 20+. 20未満は動作保証外です。`,
     );
   }
 }
