@@ -33,11 +33,11 @@ git clone https://github.com/obra/superpowers.git ~/.gemini/superpowers
 mkdir -p ~/.gemini/skills
 ```
 
-> **Note:** `superpowers-gemini` resolves the Gemini config directory by preferring `~/.gemini` and falling back to `~/.config/gemini` if `~/.gemini` does not exist. If you already use `~/.config/gemini`, you can keep it there or migrate by creating `~/.gemini`.
+> **Note:** `superpowers-gemini` は Gemini 設定ディレクトリを `~/.gemini` 優先で解決し、存在しない場合は `~/.config/gemini` にフォールバックします。`~/.config/gemini` を使っている場合はそのまま利用するか、`~/.gemini` を作成して移行できます。
 
-#### 3. Update Gemini CLI context (`GEMINI.md`)
+#### 3. Gemini CLI の標準コンテキスト (`GEMINI.md`) を更新
 
-Add this section to `~/.gemini/GEMINI.md`:
+`GEMINI.md` は Gemini CLI の標準コンテキストファイルです。`~/.gemini/GEMINI.md` に以下を追記してください:
 
 ```markdown
 ## Superpowers System

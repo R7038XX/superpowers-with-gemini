@@ -29,5 +29,8 @@ When skills reference tools you don't have, substitute your equivalent tools:
 - Superpowers skills: ~/.gemini/superpowers/skills/
 - Personal skills: ~/.gemini/skills/ (override superpowers when names match)
 
+**Gemini CLI standard context file:**
+- ~/.gemini/GEMINI.md
+
 IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 </EXTREMELY_IMPORTANT>
