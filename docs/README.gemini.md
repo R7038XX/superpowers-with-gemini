@@ -16,7 +16,7 @@ Fetch and follow instructions from https://raw.githubusercontent.com/obra/superp
 
 - Gemini CLI installed
 - Git installed
-- Node.js for `superpowers-gemini`
+- Node.js 20+ for `superpowers-gemini`
 
 ### Installation Steps
 
@@ -131,7 +131,7 @@ The `superpowers-gemini` script requires Node.js:
 node --version
 ```
 
-You should see v20 or higher.
+You should see v20+.
 
 ## Getting Help
 
