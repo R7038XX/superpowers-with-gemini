@@ -17,19 +17,10 @@ if command -v claude &> /dev/null; then
 else
     echo "Claude version: not found"
 fi
-if command -v gemini &> /dev/null; then
-    echo "Gemini version: $(gemini --version 2>/dev/null || echo 'unknown')"
-else
-    echo "Gemini version: not found"
-fi
-echo ""
-
-# Determine CLI to use (Claude Code preferred, Gemini CLI fallback)
+# Determine CLI to use (Claude Code preferred; Gemini CLI configured separately)
 if [ -z "${SUPERPOWERS_CLI_CMD:-}" ]; then
     if command -v claude &> /dev/null; then
         SUPERPOWERS_CLI_CMD="claude"
-    elif command -v gemini &> /dev/null; then
-        SUPERPOWERS_CLI_CMD="gemini"
     else
         SUPERPOWERS_CLI_CMD=""
     fi
@@ -49,9 +40,9 @@ export SUPERPOWERS_CLI_ALLOWED_TOOLS_FLAG
 export SUPERPOWERS_CLI_EXTRA_ARGS="${SUPERPOWERS_CLI_EXTRA_ARGS:-}"
 
 if [ -z "$SUPERPOWERS_CLI_CMD" ]; then
-    echo "SKIP: Claude Code CLI and Gemini CLI not found"
+    echo "SKIP: Claude Code CLI not found"
     echo "Install Claude Code: https://code.claude.com"
-    echo "Install Gemini CLI: https://github.com/google-gemini/gemini-cli"
+    echo "For Gemini CLI, use: ./run-gemini-skill-tests.sh"
     echo ""
     echo "STATUS: SKIPPED"
     exit 0

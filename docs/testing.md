@@ -14,7 +14,8 @@ tests/
 │   ├── test-helpers.sh                    # Shared test utilities
 │   ├── test-subagent-driven-development-integration.sh
 │   ├── analyze-token-usage.py             # Token analysis tool
-│   └── run-skill-tests.sh                 # Test runner (if exists)
+│   ├── run-skill-tests.sh                 # Test runner (Claude Code default)
+│   └── run-gemini-skill-tests.sh          # Test runner wrapper (Gemini CLI)
 ```
 
 ## Running Tests
@@ -34,14 +35,21 @@ cd tests/claude-code
 ### Requirements
 
 - Must run from the **superpowers plugin directory** (not from temp directories)
-- Claude Code must be installed and available as `claude` command (Gemini CLI is also supported)
+- Claude Code must be installed and available as `claude` command
 - Local dev marketplace must be enabled: `"superpowers@superpowers-dev": true` in `~/.claude/settings.json`
 
-If `claude` and `gemini` are not installed, `tests/claude-code/run-skill-tests.sh` will report `STATUS: SKIPPED` and exit successfully.
+If `claude` is not installed, `tests/claude-code/run-skill-tests.sh` will report `STATUS: SKIPPED` and exit successfully.
 
 #### Gemini CLI settings
 
-To run the tests with Gemini CLI, set the command and prompt flag as needed:
+Gemini CLI 用のテストは別ラッパーで実行します。Gemini CLI が `gemini` として利用できる必要があります。
+
+```bash
+cd tests/claude-code
+./run-gemini-skill-tests.sh
+```
+
+Gemini CLI のオプションを調整する場合は、環境変数で指定してください:
 
 ```bash
 export SUPERPOWERS_CLI_CMD=gemini
