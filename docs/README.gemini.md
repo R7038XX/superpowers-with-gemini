@@ -37,7 +37,7 @@ mkdir -p ~/.gemini/skills
 
 #### 3. Gemini CLI の標準コンテキスト (`GEMINI.md`) を更新
 
-`GEMINI.md` は Gemini CLI の標準コンテキストファイルです。`~/.gemini/GEMINI.md` に以下を追記してください:
+`GEMINI.md` は Gemini CLI が起動時に必ず読み込む標準コンテキストファイルです。`~/.gemini/GEMINI.md` に以下を追記してください:
 
 ```markdown
 ## Superpowers System
@@ -47,7 +47,7 @@ You have superpowers. Superpowers teach you new skills and capabilities. RIGHT N
 </EXTREMELY_IMPORTANT>
 ```
 
-ブートストラップの内容を `GEMINI.md` に記載する例:
+ブートストラップの内容を `GEMINI.md` に記載する例（手順 3 の追記ブロックの直後に配置します）:
 
 ```markdown
 ## Superpowers Bootstrap

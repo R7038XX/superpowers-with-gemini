@@ -19,7 +19,7 @@ Quick setup to enable superpowers skills in Gemini CLI.
 
 3. **Gemini CLI の標準コンテキストファイル (`GEMINI.md`) を更新**
 
-   `GEMINI.md` は Gemini CLI の標準コンテキストファイルです。`~/.gemini/GEMINI.md` に以下を追記してください:
+   `GEMINI.md` は Gemini CLI が起動時に必ず読み込む標準コンテキストファイルです。`~/.gemini/GEMINI.md` に以下を追記してください:
 
    ```markdown
    ## Superpowers System
@@ -29,7 +29,7 @@ Quick setup to enable superpowers skills in Gemini CLI.
    </EXTREMELY_IMPORTANT>
    ```
 
-   ブートストラップの内容を `GEMINI.md` に記載する例:
+   ブートストラップの内容を `GEMINI.md` に記載する例（追記ブロックの直後に配置します）:
 
    ```markdown
    ## Superpowers Bootstrap
@@ -38,6 +38,10 @@ Quick setup to enable superpowers skills in Gemini CLI.
    (ここに `~/.gemini/superpowers/.gemini/superpowers-gemini bootstrap` の出力を貼り付けます)
    </EXTREMELY_IMPORTANT>
    ```
+
+4. **補足の指示が必要な場合は `AGENTS.md` を利用（任意）**
+
+   `AGENTS.md` は補足の指示や運用ルールを追加したい場合に使います。`GEMINI.md` に書いた内容が最優先で読み込まれるため、`AGENTS.md` は補足扱いとして最小限の追記に留めてください。
 
 ## Verification
 
