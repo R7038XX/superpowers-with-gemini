@@ -1,21 +1,29 @@
 #!/usr/bin/env bash
-# Helper functions for Claude Code skill tests
+# Helper functions for Claude Code / Gemini CLI skill tests
 
-# Run Claude Code with a prompt and capture output
+# Run Claude Code or Gemini CLI with a prompt and capture output
 # Usage: run_claude "prompt text" [timeout_seconds] [allowed_tools]
 run_claude() {
     local prompt="$1"
     local timeout="${2:-60}"
     local allowed_tools="${3:-}"
-    local output_file=$(mktemp)
+    local output_file
+    output_file=$(mktemp)
+    local cli_cmd="${SUPERPOWERS_CLI_CMD:-claude}"
+    local prompt_flag="${SUPERPOWERS_CLI_PROMPT_FLAG:--p}"
+    local allowed_tools_flag="${SUPERPOWERS_CLI_ALLOWED_TOOLS_FLAG:---allowed-tools}"
+    local extra_args="${SUPERPOWERS_CLI_EXTRA_ARGS:-}"
 
     # Build command
-    local cmd="claude -p \"$prompt\""
-    if [ -n "$allowed_tools" ]; then
-        cmd="$cmd --allowed-tools=$allowed_tools"
+    local cmd="$cli_cmd $prompt_flag \"$prompt\""
+    if [ -n "$extra_args" ]; then
+        cmd="$cmd $extra_args"
+    fi
+    if [ -n "$allowed_tools" ] && [ -n "$allowed_tools_flag" ]; then
+        cmd="$cmd $allowed_tools_flag=$allowed_tools"
     fi
 
-    # Run Claude in headless mode with timeout
+    # Run CLI in headless mode with timeout
     if timeout "$timeout" bash -c "$cmd" > "$output_file" 2>&1; then
         cat "$output_file"
         rm -f "$output_file"
@@ -42,7 +50,7 @@ assert_contains() {
         echo "  [FAIL] $test_name"
         echo "  Expected to find: $pattern"
         echo "  In output:"
-        echo "$output" | sed 's/^/    /'
+        printf '    %s\n' "${output//$'\n'/$'\n    '}"
         return 1
     fi
 }
@@ -58,7 +66,7 @@ assert_not_contains() {
         echo "  [FAIL] $test_name"
         echo "  Did not expect to find: $pattern"
         echo "  In output:"
-        echo "$output" | sed 's/^/    /'
+        printf '    %s\n' "${output//$'\n'/$'\n    '}"
         return 1
     else
         echo "  [PASS] $test_name"
@@ -74,7 +82,8 @@ assert_count() {
     local expected="$3"
     local test_name="${4:-test}"
 
-    local actual=$(echo "$output" | grep -c "$pattern" || echo "0")
+    local actual
+    actual=$(echo "$output" | grep -c "$pattern" || echo "0")
 
     if [ "$actual" -eq "$expected" ]; then
         echo "  [PASS] $test_name (found $actual instances)"
@@ -84,7 +93,7 @@ assert_count() {
         echo "  Expected $expected instances of: $pattern"
         echo "  Found $actual instances"
         echo "  In output:"
-        echo "$output" | sed 's/^/    /'
+        printf '    %s\n' "${output//$'\n'/$'\n    '}"
         return 1
     fi
 }
@@ -98,8 +107,10 @@ assert_order() {
     local test_name="${4:-test}"
 
     # Get line numbers where patterns appear
-    local line_a=$(echo "$output" | grep -n "$pattern_a" | head -1 | cut -d: -f1)
-    local line_b=$(echo "$output" | grep -n "$pattern_b" | head -1 | cut -d: -f1)
+    local line_a
+    local line_b
+    line_a=$(echo "$output" | grep -n "$pattern_a" | head -1 | cut -d: -f1)
+    line_b=$(echo "$output" | grep -n "$pattern_b" | head -1 | cut -d: -f1)
 
     if [ -z "$line_a" ]; then
         echo "  [FAIL] $test_name: pattern A not found: $pattern_a"
@@ -125,7 +136,8 @@ assert_order() {
 # Create a temporary test project directory
 # Usage: test_project=$(create_test_project)
 create_test_project() {
-    local test_dir=$(mktemp -d)
+    local test_dir
+    test_dir=$(mktemp -d)
     echo "$test_dir"
 }
 
