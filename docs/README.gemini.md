@@ -92,6 +92,12 @@ You should see a list of available skills.
 ~/.gemini/superpowers/.gemini/superpowers-gemini use-skill superpowers:brainstorming
 ```
 
+### Doctor (診断)
+
+```bash
+~/.gemini/superpowers/.gemini/superpowers-gemini doctor
+```
+
 ### Skill loading workflow
 
 1. Run the bootstrap to disclose all skills and rules:

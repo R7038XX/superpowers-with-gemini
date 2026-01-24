@@ -326,6 +326,215 @@ async function main() {
     console.log(content);
   }
 
+  function runDoctor() {
+    const checks = [];
+
+    const nodeVersion = process.versions.node || "";
+    const majorVersion = Number.parseInt(nodeVersion.split(".")[0], 10);
+    if (Number.isNaN(majorVersion)) {
+      checks.push({
+        title: "Node.js バージョン",
+        status: "warn",
+        detail: "Node.js のバージョンを判定できません。",
+        remedy:
+          "Node.js 20 以上をインストールし、`node --version` で確認してください。",
+      });
+    } else if (majorVersion < 20) {
+      checks.push({
+        title: "Node.js バージョン",
+        status: "warn",
+        detail: `Node.js ${nodeVersion} を検出しました (推奨: 20+).`,
+        remedy:
+          "Node.js 20 以上へアップデートしてください。例: `nvm install 20 && nvm use 20`",
+      });
+    } else {
+      checks.push({
+        title: "Node.js バージョン",
+        status: "ok",
+        detail: `Node.js ${nodeVersion} を検出しました。`,
+        remedy: "この項目は対応不要です。",
+      });
+    }
+
+    const preferredExists = fs.existsSync(preferredGeminiDir);
+    const fallbackExists = fs.existsSync(fallbackGeminiDir);
+    const resolvedDir = preferredExists
+      ? preferredGeminiDir
+      : fallbackGeminiDir;
+    const resolvedLabel = displayPath(resolvedDir);
+    let configStatus = "ok";
+    let configDetail = `Gemini 設定ディレクトリは ${resolvedLabel} です。`;
+    let configRemedy = "この項目は対応不要です。";
+    if (!preferredExists && !fallbackExists) {
+      configStatus = "fail";
+      configDetail =
+        "~/.gemini と ~/.config/gemini のどちらも存在しません。";
+      configRemedy =
+        "どちらかのディレクトリを作成してください。例: `mkdir -p ~/.gemini`";
+    } else if (!preferredExists && fallbackExists) {
+      configStatus = "warn";
+      configDetail = `~/.config/gemini を使用しています (${resolvedLabel})。`;
+      configRemedy =
+        "~/.gemini を使いたい場合は `mkdir -p ~/.gemini` を実行して移行してください。";
+    } else if (preferredExists && fallbackExists) {
+      configStatus = "warn";
+      configDetail =
+        `~/.gemini と ~/.config/gemini の両方が存在します。` +
+        ` 現在は ${resolvedLabel} を使用します。`;
+      configRemedy =
+        "片方のみ使う場合は不要なディレクトリを削除するか内容を統合してください。";
+    }
+
+    checks.push({
+      title: "Gemini 設定ディレクトリ",
+      status: configStatus,
+      detail: configDetail,
+      remedy: configRemedy,
+    });
+
+    if (fs.existsSync(personalSkillsDir)) {
+      checks.push({
+        title: "Personal skills ディレクトリ",
+        status: "ok",
+        detail: `${displayPath(personalSkillsDir)} を検出しました。`,
+        remedy: "この項目は対応不要です。",
+      });
+    } else {
+      checks.push({
+        title: "Personal skills ディレクトリ",
+        status: "fail",
+        detail: `${displayPath(personalSkillsDir)} が見つかりません。`,
+        remedy: `作成してください: mkdir -p ${displayPath(personalSkillsDir)}`,
+      });
+    }
+
+    if (fs.existsSync(superpowersSkillsDir)) {
+      checks.push({
+        title: "Superpowers skills ディレクトリ",
+        status: "ok",
+        detail: `${displayPath(superpowersSkillsDir)} を検出しました。`,
+        remedy: "この項目は対応不要です。",
+      });
+    } else {
+      checks.push({
+        title: "Superpowers skills ディレクトリ",
+        status: "fail",
+        detail: `${displayPath(superpowersSkillsDir)} が見つかりません。`,
+        remedy:
+          `Superpowers リポジトリを配置してください。例: ` +
+          `git clone https://github.com/obra/superpowers.git ${displayPath(
+            superpowersRepoDir,
+          )}`,
+      });
+    }
+
+    const geminiFile = path.join(resolvedDir, "GEMINI.md");
+    const displayGeminiFile = displayPath(geminiFile);
+    if (!fs.existsSync(geminiFile)) {
+      checks.push({
+        title: "GEMINI.md",
+        status: "fail",
+        detail: `${displayGeminiFile} が見つかりません。`,
+        remedy: `作成または更新してください: ${displayPath(
+          path.join(superpowersRepoDir, ".gemini", "superpowers-gemini"),
+        )} init`,
+      });
+    } else {
+      let geminiContent = "";
+      try {
+        geminiContent = fs.readFileSync(geminiFile, "utf8");
+      } catch (error) {
+        checks.push({
+          title: "GEMINI.md",
+          status: "fail",
+          detail: `${displayGeminiFile} を読み取れません: ${error.message}`,
+          remedy: "ファイル権限を確認して再試行してください。",
+        });
+        geminiContent = "";
+      }
+
+      if (geminiContent) {
+        let bootstrapContent = "";
+        try {
+          bootstrapContent = fs.readFileSync(bootstrapFile, "utf8");
+        } catch (error) {
+          checks.push({
+            title: "Superpowers ブートストラップ文言",
+            status: "fail",
+            detail: `ブートストラップファイルを読み取れません: ${error.message}`,
+            remedy:
+              "superpowers リポジトリが正しく配置されているか確認してください。",
+          });
+        }
+
+        if (bootstrapContent) {
+          const expectedBlock = replaceGeminiDirForDir(
+            bootstrapContent,
+            resolvedDir,
+          ).trim();
+          const normalizedGemini = geminiContent.replace(/\r\n/g, "\n");
+          const normalizedBlock = expectedBlock.replace(/\r\n/g, "\n");
+          const hasBootstrap = normalizedGemini.includes(normalizedBlock);
+          checks.push({
+            title: "Superpowers ブートストラップ文言",
+            status: hasBootstrap ? "ok" : "warn",
+            detail: hasBootstrap
+              ? "GEMINI.md にブートストラップ文言が含まれています。"
+              : "GEMINI.md にブートストラップ文言が見つかりません。",
+            remedy: hasBootstrap
+              ? "この項目は対応不要です。"
+              : `${displayPath(
+                  path.join(superpowersRepoDir, ".gemini", "superpowers-gemini"),
+                )} init を実行して追記してください。`,
+          });
+        }
+      }
+    }
+
+    let execStatus = "ok";
+    let execDetail = `${displayPath(__filename)} は実行可能です。`;
+    let execRemedy = "この項目は対応不要です。";
+    try {
+      fs.accessSync(__filename, fs.constants.X_OK);
+    } catch (error) {
+      execStatus = "fail";
+      execDetail = `${displayPath(__filename)} に実行権限がありません。`;
+      execRemedy = `実行権限を付与してください: chmod +x ${displayPath(
+        __filename,
+      )}`;
+    }
+
+    checks.push({
+      title: "superpowers-gemini 実行権限",
+      status: execStatus,
+      detail: execDetail,
+      remedy: execRemedy,
+    });
+
+    const statusIcon = (status) => {
+      switch (status) {
+        case "ok":
+          return "✅";
+        case "warn":
+          return "⚠️";
+        case "fail":
+          return "❌";
+        default:
+          return "•";
+      }
+    };
+
+    console.log("Superpowers Doctor");
+    console.log("==================");
+    console.log("");
+    for (const check of checks) {
+      console.log(`${statusIcon(check.status)} ${check.title}`);
+      console.log(`  状態: ${check.detail}`);
+      console.log(`  対処: ${check.remedy}`);
+      console.log("");
+    }
+  }
+
   switch (command) {
     case "bootstrap":
       runBootstrap();
@@ -339,6 +548,9 @@ async function main() {
       break;
     case "find-skills":
       runFindSkills();
+      break;
+    case "doctor":
+      runDoctor();
       break;
     default:
       console.log("Superpowers for Gemini CLI");
@@ -358,12 +570,16 @@ async function main() {
       console.log(
         "  superpowers-gemini find-skills            # List all available skills",
       );
+      console.log(
+        "  superpowers-gemini doctor                 # Diagnose installation status",
+      );
       console.log("");
       console.log("Examples:");
       console.log("  superpowers-gemini bootstrap");
       console.log("  superpowers-gemini init");
       console.log("  superpowers-gemini use-skill superpowers:brainstorming");
       console.log("  superpowers-gemini use-skill my-custom-skill");
+      console.log("  superpowers-gemini doctor");
       break;
   }
 }
