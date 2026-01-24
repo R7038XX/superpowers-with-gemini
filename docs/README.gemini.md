@@ -131,7 +131,7 @@ The `superpowers-gemini` script requires Node.js:
 node --version
 ```
 
-You should see v14 or higher (v18+ recommended).
+You should see v20 or higher.
 
 ## Getting Help
 

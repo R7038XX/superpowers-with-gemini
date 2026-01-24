@@ -4,6 +4,14 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+function warnIfUnsupportedNode() {
+    const nodeVersion = process.versions.node || '';
+    const majorVersion = Number.parseInt(nodeVersion.split('.')[0], 10);
+    if (!Number.isNaN(majorVersion) && majorVersion < 20) {
+        console.warn(`⚠️  Node.js ${nodeVersion} detected. superpowers-gemini requires Node.js >=20.`);
+    }
+}
+
 const command = process.argv[2];
 const arg = process.argv[3];
 
@@ -17,6 +25,7 @@ const personalSkillsDir = path.join(geminiConfigDir, 'skills');
 const bootstrapFile = path.join(superpowersRepoDir, '.gemini', 'superpowers-bootstrap.md');
 
 async function main() {
+    warnIfUnsupportedNode();
     const skillsCore = await import('../lib/skills-core.js');
     const {
         extractFrontmatter,
