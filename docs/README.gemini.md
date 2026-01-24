@@ -23,33 +23,34 @@ Fetch and follow instructions from https://raw.githubusercontent.com/obra/superp
 #### 1. Clone Superpowers
 
 ```bash
-mkdir -p ~/.config/gemini/superpowers
-git clone https://github.com/obra/superpowers.git ~/.config/gemini/superpowers
+mkdir -p ~/.gemini/superpowers
+git clone https://github.com/obra/superpowers.git ~/.gemini/superpowers
 ```
 
 #### 2. Create personal skills directory
 
 ```bash
-mkdir -p ~/.config/gemini/skills
+mkdir -p ~/.gemini/skills
 ```
 
-#### 3. Update initial prompt/agent config
+> **Note:** `superpowers-gemini` resolves the Gemini config directory by preferring `~/.gemini` and falling back to `~/.config/gemini` if `~/.gemini` does not exist. If you already use `~/.config/gemini`, you can keep it there or migrate by creating `~/.gemini`.
 
-If Gemini CLI loads an initial prompt/agent config file, add this section.
-Example: `~/.config/gemini/AGENTS.md`
+#### 3. Update Gemini CLI context (`GEMINI.md`)
+
+Add this section to `~/.gemini/GEMINI.md`:
 
 ```markdown
 ## Superpowers System
 
 <EXTREMELY_IMPORTANT>
-You have superpowers. Superpowers teach you new skills and capabilities. RIGHT NOW run: `~/.config/gemini/superpowers/.gemini/superpowers-gemini bootstrap` and follow the instructions it returns.
+You have superpowers. Superpowers teach you new skills and capabilities. RIGHT NOW run: `~/.gemini/superpowers/.gemini/superpowers-gemini bootstrap` and follow the instructions it returns.
 </EXTREMELY_IMPORTANT>
 ```
 
 #### 4. Verify installation
 
 ```bash
-~/.config/gemini/superpowers/.gemini/superpowers-gemini find-skills
+~/.gemini/superpowers/.gemini/superpowers-gemini find-skills
 ```
 
 You should see a list of available skills.
@@ -59,31 +60,31 @@ You should see a list of available skills.
 ### Finding skills
 
 ```bash
-~/.config/gemini/superpowers/.gemini/superpowers-gemini find-skills
+~/.gemini/superpowers/.gemini/superpowers-gemini find-skills
 ```
 
 ### Loading a skill
 
 ```bash
-~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill superpowers:brainstorming
+~/.gemini/superpowers/.gemini/superpowers-gemini use-skill superpowers:brainstorming
 ```
 
 ### Skill loading workflow
 
 1. Run the bootstrap to disclose all skills and rules:
    ```bash
-   ~/.config/gemini/superpowers/.gemini/superpowers-gemini bootstrap
+   ~/.gemini/superpowers/.gemini/superpowers-gemini bootstrap
    ```
 2. When a skill applies, load it explicitly:
    ```bash
-   ~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill superpowers:using-superpowers
+   ~/.gemini/superpowers/.gemini/superpowers-gemini use-skill superpowers:using-superpowers
    ```
 3. Announce that you loaded the skill and follow its checklist.
 
 ### Bootstrap all skills
 
 ```bash
-~/.config/gemini/superpowers/.gemini/superpowers-gemini bootstrap
+~/.gemini/superpowers/.gemini/superpowers-gemini bootstrap
 ```
 
 ## Tool mapping
@@ -94,7 +95,7 @@ Skills are authored for Claude Code. In Gemini CLI, map tools as follows:
 | --- | --- |
 | `TodoWrite` | Gemini CLI task/planning tool (use your native planning/todo feature). |
 | `Task` (subagents) | Subagents are unavailable; explain that and do the work directly. |
-| `Skill` | `~/.config/gemini/superpowers/.gemini/superpowers-gemini use-skill <skill-name>` |
+| `Skill` | `~/.gemini/superpowers/.gemini/superpowers-gemini use-skill <skill-name>` |
 | `Read` / `Write` / `Edit` / `Bash` | Gemini CLI native file + shell tools. |
 
 If Gemini CLI exposes different names, keep the intent the same and note the substitution.
@@ -102,24 +103,24 @@ If Gemini CLI exposes different names, keep the intent the same and note the sub
 ## Updating
 
 ```bash
-cd ~/.config/gemini/superpowers
+cd ~/.gemini/superpowers
 git pull
 ```
 
-Restart Gemini CLI after updating, and re-check `~/.config/gemini/AGENTS.md` if needed.
+Restart Gemini CLI after updating, and re-check `~/.gemini/GEMINI.md` if needed.
 
 ## Troubleshooting
 
 ### Skills not found
 
-1. Check the skills directory: `ls ~/.config/gemini/superpowers/skills`
-2. Verify the CLI works: `~/.config/gemini/superpowers/.gemini/superpowers-gemini find-skills`
+1. Check the skills directory: `ls ~/.gemini/superpowers/skills`
+2. Verify the CLI works: `~/.gemini/superpowers/.gemini/superpowers-gemini find-skills`
 3. Ensure each skill has a `SKILL.md` file
 
 ### CLI script not executable
 
 ```bash
-chmod +x ~/.config/gemini/superpowers/.gemini/superpowers-gemini
+chmod +x ~/.gemini/superpowers/.gemini/superpowers-gemini
 ```
 
 ### Node.js errors

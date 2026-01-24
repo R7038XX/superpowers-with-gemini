@@ -12,15 +12,53 @@ echo "========================================"
 echo ""
 echo "Repository: $(cd ../.. && pwd)"
 echo "Test time: $(date)"
-echo "Claude version: $(claude --version 2>/dev/null || echo 'not found')"
+if command -v claude &> /dev/null; then
+    echo "Claude version: $(claude --version 2>/dev/null || echo 'unknown')"
+else
+    echo "Claude version: not found"
+fi
+if command -v gemini &> /dev/null; then
+    echo "Gemini version: $(gemini --version 2>/dev/null || echo 'unknown')"
+else
+    echo "Gemini version: not found"
+fi
 echo ""
 
-# Check if Claude Code is available
-if ! command -v claude &> /dev/null; then
-    echo "ERROR: Claude Code CLI not found"
-    echo "Install Claude Code first: https://code.claude.com"
-    exit 1
+# Determine CLI to use (Claude Code preferred, Gemini CLI fallback)
+if [ -z "${SUPERPOWERS_CLI_CMD:-}" ]; then
+    if command -v claude &> /dev/null; then
+        SUPERPOWERS_CLI_CMD="claude"
+    elif command -v gemini &> /dev/null; then
+        SUPERPOWERS_CLI_CMD="gemini"
+    else
+        SUPERPOWERS_CLI_CMD=""
+    fi
 fi
+
+if [ -z "${SUPERPOWERS_CLI_PROMPT_FLAG:-}" ]; then
+    SUPERPOWERS_CLI_PROMPT_FLAG="-p"
+fi
+
+if [ -z "${SUPERPOWERS_CLI_ALLOWED_TOOLS_FLAG+x}" ]; then
+    SUPERPOWERS_CLI_ALLOWED_TOOLS_FLAG="--allowed-tools"
+fi
+
+export SUPERPOWERS_CLI_CMD
+export SUPERPOWERS_CLI_PROMPT_FLAG
+export SUPERPOWERS_CLI_ALLOWED_TOOLS_FLAG
+export SUPERPOWERS_CLI_EXTRA_ARGS="${SUPERPOWERS_CLI_EXTRA_ARGS:-}"
+
+if [ -z "$SUPERPOWERS_CLI_CMD" ]; then
+    echo "SKIP: Claude Code CLI and Gemini CLI not found"
+    echo "Install Claude Code: https://code.claude.com"
+    echo "Install Gemini CLI: https://github.com/google-gemini/gemini-cli"
+    echo ""
+    echo "STATUS: SKIPPED"
+    exit 0
+fi
+
+echo "Using CLI: $SUPERPOWERS_CLI_CMD"
+echo ""
 
 # Parse command line arguments
 VERBOSE=false
@@ -154,7 +192,7 @@ for test in "${tests[@]}"; do
             fi
             echo ""
             echo "  Output:"
-            echo "$output" | sed 's/^/    /'
+            printf '    %s\n' "${output//$'\n'/$'\n    '}"
             failed=$((failed + 1))
         fi
     fi

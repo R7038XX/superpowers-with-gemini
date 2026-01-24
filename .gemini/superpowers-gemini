@@ -8,7 +8,9 @@ const command = process.argv[2];
 const arg = process.argv[3];
 
 const homeDir = os.homedir();
-const geminiConfigDir = path.join(homeDir, '.config', 'gemini');
+const geminiConfigDir = fs.existsSync(path.join(homeDir, '.gemini'))
+    ? path.join(homeDir, '.gemini')
+    : path.join(homeDir, '.config', 'gemini');
 const superpowersRepoDir = path.join(geminiConfigDir, 'superpowers');
 const superpowersSkillsDir = path.join(superpowersRepoDir, 'skills');
 const personalSkillsDir = path.join(geminiConfigDir, 'skills');
@@ -23,6 +25,9 @@ async function main() {
         checkForUpdates,
         stripFrontmatter
     } = skillsCore;
+    const displayPath = (targetPath) => targetPath.startsWith(homeDir)
+        ? `~${targetPath.slice(homeDir.length)}`
+        : targetPath;
 
     function printSkill(skillPath, sourceType) {
         const skillFile = path.join(skillPath, 'SKILL.md');
@@ -67,8 +72,8 @@ async function main() {
         console.log('  superpowers-gemini use-skill <skill-name>   # Load a specific skill');
         console.log('');
         console.log('Skill naming:');
-        console.log('  Superpowers skills: superpowers:skill-name (from ~/.config/gemini/superpowers/skills/)');
-        console.log('  Personal skills: skill-name (from ~/.config/gemini/skills/)');
+        console.log(`  Superpowers skills: superpowers:skill-name (from ${displayPath(superpowersSkillsDir)}/)`);
+        console.log(`  Personal skills: skill-name (from ${displayPath(personalSkillsDir)}/)`);
         console.log('  Personal skills override superpowers skills when names match.');
         console.log('');
         console.log('Note: All skills are disclosed at session start via bootstrap.');
@@ -83,7 +88,7 @@ async function main() {
             console.log('## Update Available');
             console.log('');
             console.log('⚠️  Your superpowers installation is behind the latest version.');
-            console.log('To update, run: `cd ~/.config/gemini/superpowers && git pull`');
+            console.log(`To update, run: \`cd ${displayPath(superpowersRepoDir)} && git pull\``);
             console.log('');
             console.log('---');
             console.log('');

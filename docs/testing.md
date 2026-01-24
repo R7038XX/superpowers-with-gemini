@@ -34,8 +34,26 @@ cd tests/claude-code
 ### Requirements
 
 - Must run from the **superpowers plugin directory** (not from temp directories)
-- Claude Code must be installed and available as `claude` command
+- Claude Code must be installed and available as `claude` command (Gemini CLI is also supported)
 - Local dev marketplace must be enabled: `"superpowers@superpowers-dev": true` in `~/.claude/settings.json`
+
+If `claude` and `gemini` are not installed, `tests/claude-code/run-skill-tests.sh` will report `STATUS: SKIPPED` and exit successfully.
+
+#### Gemini CLI settings
+
+To run the tests with Gemini CLI, set the command and prompt flag as needed:
+
+```bash
+export SUPERPOWERS_CLI_CMD=gemini
+export SUPERPOWERS_CLI_PROMPT_FLAG=-p
+export SUPERPOWERS_CLI_ALLOWED_TOOLS_FLAG=""
+```
+
+If your Gemini CLI needs extra arguments (auth, model, etc.), set them with:
+
+```bash
+export SUPERPOWERS_CLI_EXTRA_ARGS="--model gemini-1.5-pro"
+```
 
 ## Integration Test: subagent-driven-development
 
