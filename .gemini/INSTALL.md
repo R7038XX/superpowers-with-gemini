@@ -84,4 +84,4 @@ The `superpowers-gemini` script requires Node.js:
 node --version
 ```
 
-You should see v20+.
+You should see v20+ (Node.js **20+** required).
