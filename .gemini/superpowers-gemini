@@ -189,6 +189,15 @@ async function main() {
     }
 
     const targetDirs = [preferredGeminiDir, fallbackGeminiDir];
+    const importBlockTemplate = [
+      "## Superpowers Bootstrap",
+      "",
+      "@{{GEMINI_CONFIG_DIR}}/superpowers/.gemini/superpowers-bootstrap.md",
+    ].join("\n");
+    const legacyBootstrapRegex =
+      /<EXTREMELY_IMPORTANT>[\s\S]*?IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE\. YOU MUST USE IT\.[\s\S]*?<\/EXTREMELY_IMPORTANT>/;
+    const bootstrapSectionRegex =
+      /^## Superpowers Bootstrap\s*\n[\s\S]*?(?=^##\s|\s*$)/m;
 
     for (const targetDir of targetDirs) {
       const geminiFile = path.join(targetDir, "GEMINI.md");
@@ -212,7 +221,7 @@ async function main() {
       }
 
       const block = replaceGeminiDirForDir(
-        bootstrapContent,
+        importBlockTemplate,
         targetDir,
       ).trim();
       const normalizedExisting = existingContent.replace(/\r\n/g, "\n");
@@ -225,10 +234,28 @@ async function main() {
         continue;
       }
 
-      const trimmedExisting = existingContent.replace(/\s*$/, "");
-      const nextContent = trimmedExisting
-        ? `${trimmedExisting}\n\n${block}\n`
-        : `${block}\n`;
+      let updatedExisting = normalizedExisting;
+      let replacedLegacy = false;
+      if (bootstrapSectionRegex.test(normalizedExisting)) {
+        updatedExisting = normalizedExisting.replace(
+          bootstrapSectionRegex,
+          normalizedBlock,
+        );
+        replacedLegacy = true;
+      } else if (legacyBootstrapRegex.test(normalizedExisting)) {
+        updatedExisting = normalizedExisting.replace(
+          legacyBootstrapRegex,
+          normalizedBlock,
+        );
+        replacedLegacy = true;
+      }
+
+      const trimmedExisting = updatedExisting.replace(/\s*$/, "");
+      const nextContent = replacedLegacy
+        ? `${trimmedExisting}\n`
+        : trimmedExisting
+          ? `${trimmedExisting}\n\n${block}\n`
+          : `${block}\n`;
 
       try {
         fs.writeFileSync(geminiFile, nextContent, "utf8");
@@ -468,24 +495,45 @@ async function main() {
         }
 
         if (bootstrapContent) {
+          const importBlockTemplate = [
+            "## Superpowers Bootstrap",
+            "",
+            "@{{GEMINI_CONFIG_DIR}}/superpowers/.gemini/superpowers-bootstrap.md",
+          ].join("\n");
           const expectedBlock = replaceGeminiDirForDir(
+            importBlockTemplate,
+            resolvedDir,
+          ).trim();
+          const legacyBlock = replaceGeminiDirForDir(
             bootstrapContent,
             resolvedDir,
           ).trim();
+          const legacyBootstrapRegex =
+            /<EXTREMELY_IMPORTANT>[\s\S]*?IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE\. YOU MUST USE IT\.[\s\S]*?<\/EXTREMELY_IMPORTANT>/;
+          const bootstrapSectionRegex =
+            /^## Superpowers Bootstrap\s*\n[\s\S]*?(?=^##\s|\s*$)/m;
           const normalizedGemini = geminiContent.replace(/\r\n/g, "\n");
           const normalizedBlock = expectedBlock.replace(/\r\n/g, "\n");
-          const hasBootstrap = normalizedGemini.includes(normalizedBlock);
+          const normalizedLegacy = legacyBlock.replace(/\r\n/g, "\n");
+          const hasImport = normalizedGemini.includes(normalizedBlock);
+          const hasLegacy =
+            !hasImport &&
+            (normalizedGemini.includes(normalizedLegacy) ||
+              legacyBootstrapRegex.test(normalizedGemini) ||
+              bootstrapSectionRegex.test(normalizedGemini));
           checks.push({
             title: "Superpowers ブートストラップ文言",
-            status: hasBootstrap ? "ok" : "warn",
-            detail: hasBootstrap
-              ? "GEMINI.md にブートストラップ文言が含まれています。"
-              : "GEMINI.md にブートストラップ文言が見つかりません。",
-            remedy: hasBootstrap
+            status: hasImport ? "ok" : "warn",
+            detail: hasImport
+              ? "GEMINI.md にブートストラップの @import が含まれています。"
+              : hasLegacy
+                ? "GEMINI.md に旧形式の貼り付け済みブートストラップがあります。"
+                : "GEMINI.md にブートストラップ文言が見つかりません。",
+            remedy: hasImport
               ? "この項目は対応不要です。"
               : `${displayPath(
                   path.join(superpowersRepoDir, ".gemini", "superpowers-gemini"),
-                )} init を実行して追記してください。`,
+                )} init を実行して差し替えてください。`,
           });
         }
       }
