@@ -15,7 +15,8 @@ function warnIfUnsupportedNode() {
 }
 
 const command = process.argv[2];
-const arg = process.argv[3];
+const args = process.argv.slice(3);
+const arg = args[0];
 
 const homeDir = os.homedir();
 const preferredGeminiDir = path.join(homeDir, ".gemini");
@@ -179,7 +180,66 @@ async function main() {
     );
   }
 
-  function runInit() {
+  function updateContextFileNames(
+    fileNames = ["GEMINI.md", "AGENTS.md"],
+  ) {
+    const settingsDir = preferredGeminiDir;
+    const settingsFile = path.join(settingsDir, "settings.json");
+    const displaySettingsFile = displayPath(settingsFile);
+
+    try {
+      fs.mkdirSync(settingsDir, { recursive: true });
+    } catch (error) {
+      console.log(
+        `Failed to create ${displayPath(settingsDir)}: ${error.message}`,
+      );
+      return;
+    }
+
+    let settings = {};
+    if (fs.existsSync(settingsFile)) {
+      try {
+        const rawSettings = fs.readFileSync(settingsFile, "utf8");
+        settings = rawSettings.trim() ? JSON.parse(rawSettings) : {};
+      } catch (error) {
+        console.log(
+          `Failed to read ${displaySettingsFile}: ${error.message}`,
+        );
+        return;
+      }
+    }
+
+    const existing = settings.context?.fileName;
+    const existingList = Array.isArray(existing)
+      ? existing
+      : existing
+        ? [existing]
+        : [];
+    const merged = [...existingList];
+    for (const name of fileNames) {
+      if (!merged.includes(name)) {
+        merged.push(name);
+      }
+    }
+
+    settings.context = {
+      ...settings.context,
+      fileName: merged,
+    };
+
+    try {
+      fs.writeFileSync(
+        settingsFile,
+        `${JSON.stringify(settings, null, 2)}\n`,
+        "utf8",
+      );
+      console.log(`Updated ${displaySettingsFile}`);
+    } catch (error) {
+      console.log(`Failed to update ${displaySettingsFile}: ${error.message}`);
+    }
+  }
+
+  function runInit(options = {}) {
     let bootstrapContent;
     try {
       bootstrapContent = fs.readFileSync(bootstrapFile, "utf8");
@@ -263,6 +323,10 @@ async function main() {
       } catch (error) {
         console.log(`Failed to update ${displayGeminiFile}: ${error.message}`);
       }
+    }
+
+    if (options.updateSettings) {
+      updateContextFileNames();
     }
   }
 
@@ -589,7 +653,11 @@ async function main() {
       break;
     case "init":
     case "install":
-      runInit();
+      runInit({
+        updateSettings:
+          args.includes("--update-settings") ||
+          args.includes("--context-file-names"),
+      });
       break;
     case "use-skill":
       runUseSkill(arg);
@@ -608,6 +676,12 @@ async function main() {
       );
       console.log(
         "  superpowers-gemini init                   # Update GEMINI.md files with bootstrap content",
+      );
+      console.log(
+        "  superpowers-gemini init --update-settings # Add context.fileName to settings.json",
+      );
+      console.log(
+        "  superpowers-gemini init --context-file-names # Alias for --update-settings",
       );
       console.log(
         "  superpowers-gemini install                # Alias for init",

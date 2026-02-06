@@ -30,5 +30,8 @@ When skills reference tools you don't have, substitute your equivalent tools:
 **Gemini CLI standard context file:**
 - {{GEMINI_CONFIG_DIR}}/GEMINI.md
 
+**AGENTS.md を使う場合:**
+- settings.json の `context.fileName` に `AGENTS.md` を追加してください
+
 IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
 </EXTREMELY_IMPORTANT>

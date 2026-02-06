@@ -39,6 +39,8 @@ mkdir -p ~/.gemini/skills
 
 `GEMINI.md` は Gemini CLI が起動時に必ず読み込む標準コンテキストファイルです。`superpowers-gemini init` を使うと `~/.gemini/GEMINI.md` と `~/.config/gemini/GEMINI.md` の両方を探索して、存在する場合は追記、なければ新規作成します。
 
+あわせて、Gemini CLI の `settings.json` で `context.fileName` を設定すると、追加のコンテキストファイル名を自動読み込みできます。`superpowers-gemini init --update-settings` は `~/.gemini/settings.json` に `context.fileName` を追記し、`["GEMINI.md","AGENTS.md"]` を重複なしでマージします（`--context-file-names` も同じ動作です）。
+
 ```bash
 ~/.gemini/superpowers/.gemini/superpowers-gemini init
 ```
@@ -48,6 +50,12 @@ mkdir -p ~/.gemini/skills
 ```text
 Updated ~/.gemini/GEMINI.md
 Updated ~/.config/gemini/GEMINI.md
+```
+
+`context.fileName` も更新する場合:
+
+```bash
+~/.gemini/superpowers/.gemini/superpowers-gemini init --update-settings
 ```
 
 手動で追記する場合は、`~/.gemini/GEMINI.md` に以下を追加してください:
@@ -74,6 +82,20 @@ You have superpowers. Superpowers teach you new skills and capabilities. RIGHT N
 - 複数の端末やプロファイルで同じ参照を使えます
 
 更新後は Gemini CLI で `/memory refresh` を実行して反映するのがおすすめです。
+
+#### 3-1. `context.fileName` 設定の補足
+
+Gemini CLI の公式仕様では `settings.json` に `context.fileName`（配列）を設定することで、指定したファイル名のコンテキストを自動読み込みできます。例:
+
+```json
+{
+  "context": {
+    "fileName": ["GEMINI.md", "AGENTS.md"]
+  }
+}
+```
+
+`AGENTS.md` を併用する場合は `GEMINI.md` と合わせて `AGENTS.md` を追加する設定が推奨です。
 
 #### 4. Verify installation
 
