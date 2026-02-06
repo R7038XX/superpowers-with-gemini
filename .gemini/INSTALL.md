@@ -23,6 +23,8 @@ Quick setup to enable superpowers skills in Gemini CLI.
 
    さらに `settings.json` の `context.fileName` を設定すると、指定したファイル名のコンテキストを自動読み込みできます。`superpowers-gemini init --update-settings` は `~/.gemini/settings.json` に `context.fileName` を追記し、`["GEMINI.md","AGENTS.md"]` を重複なしでマージします（`--context-file-names` も同じ動作です）。
 
+   `GEMINI.md` は global（`~/.gemini` など）だけでなく、プロジェクト固有の `GEMINI.md` を併用できます。衝突を避けるため、global 側は最小限の共通ルールに留め、プロジェクト側はそのリポジトリ専用の具体的な指示をまとめるのがおすすめです。
+
    ```bash
    ~/.gemini/superpowers/.gemini/superpowers-gemini init
    ```

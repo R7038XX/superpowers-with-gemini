@@ -97,6 +97,12 @@ Gemini CLI の公式仕様では `settings.json` に `context.fileName`（配列
 
 `AGENTS.md` を併用する場合は `GEMINI.md` と合わせて `AGENTS.md` を追加する設定が推奨です。
 
+#### 3-2. `GEMINI.md` の階層読み込みと `.geminiignore`
+
+Gemini CLI は `GEMINI.md` を階層的に読み込みます。読み込み順は **global → project root → subdir** で、現在の作業ディレクトリに近いファイルほど後から適用されます。たとえば `~/.gemini/GEMINI.md`（または `~/.config/gemini/GEMINI.md`）が global、リポジトリ直下の `GEMINI.md` が project root、さらにサブディレクトリ配下の `GEMINI.md` が subdir として読み込まれます。
+
+また、`.geminiignore` は Gemini CLI が `GEMINI.md` を探索する際の対象外パスを指定するファイルです。巨大なディレクトリや無関係なパスを除外したい場合に追加すると、不要な読み込みやノイズを抑えられます。
+
 #### 4. Verify installation
 
 ```bash
@@ -142,6 +148,14 @@ You should see a list of available skills.
 ```bash
 ~/.gemini/superpowers/.gemini/superpowers-gemini bootstrap
 ```
+
+### `/memory` コマンドの使いどころ
+
+Gemini CLI のメモリ関連コマンドは、`GEMINI.md` や `@` インポート、`context.fileName` の更新を反映したいときに有効です。
+
+- `/memory show`: 現在読み込まれているメモリ（コンテキスト）内容を確認したいときに使います。更新が反映されているかのチェックに便利です。
+- `/memory refresh`: 既存のメモリを再読み込みします。`GEMINI.md` や `@` インポート内容を更新したあと、反映させたいときに使います。
+- `/memory add`: その場で追加したい短い補足指示や一時的なメモを入れるときに使います。恒久的に残したい内容は `GEMINI.md` に書くのが推奨です。
 
 ## Tool mapping
 
