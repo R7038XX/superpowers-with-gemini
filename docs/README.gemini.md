@@ -60,15 +60,20 @@ You have superpowers. Superpowers teach you new skills and capabilities. RIGHT N
 </EXTREMELY_IMPORTANT>
 ```
 
-ブートストラップの内容を `GEMINI.md` に記載する例（手順 3 の追記ブロックの直後に配置します）:
+ブートストラップは `@` インポート方式で読み込むのが推奨です（手順 3 の追記ブロックの直後に配置します）:
 
 ```markdown
 ## Superpowers Bootstrap
 
-<EXTREMELY_IMPORTANT>
-(ここに `~/.gemini/superpowers/.gemini/superpowers-gemini bootstrap` の出力を貼り付けます)
-</EXTREMELY_IMPORTANT>
+@~/.gemini/superpowers/.gemini/superpowers-bootstrap.md
 ```
+
+`@` インポート方式の利点:
+- ブートストラップ内容を貼り付けずに済み、重複や差分管理を避けられます
+- `git pull` 後に最新のブートストラップが自動で反映されます
+- 複数の端末やプロファイルで同じ参照を使えます
+
+更新後は Gemini CLI で `/memory refresh` を実行して反映するのがおすすめです。
 
 #### 4. Verify installation
 
